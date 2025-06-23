@@ -1,0 +1,24 @@
+# .github/workflows/monitor_max.yml
+name: Monitor Tiendas Máx
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Ejecutar diario a las 8AM
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install -r requirements.txt
+      - run: python max_spider.py
+      - name: Notificar cambios
+        if: ${{ failure() }}
+        uses: actions/slack@v1
+        with:
+          payload: |
+            {
+              "text": "⚠️ Cambios detectados en Tiendas Máx. Revisar selectores."
+            }
